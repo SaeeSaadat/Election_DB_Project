@@ -25,5 +25,3 @@ def create_people():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-fapfinflfnfaflk
