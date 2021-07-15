@@ -93,3 +93,10 @@ create table vote (
     foreign key (person_id) references person(id),
     foreign key (candidate_id) references candidate(candidate_id)
 );
+
+
+create table user_person (
+    username varchar primary key ,
+    person_id int,
+    foreign key (person_id) references person(id)
+);
