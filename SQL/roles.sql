@@ -4,9 +4,9 @@ create group candidates;
 create group judges;
 
 create role saee superuser createdb createrole replication bypassrls  encrypted password 'god';
-create role alireza superuser createdb createrole replication bypassrls  encrypted password 'god';
+create role ali superuser createdb createrole replication bypassrls  encrypted password 'god';
 grant god to saee;
-grant god to alireza;
+grant god to ali;
 
 
 create role asghar login encrypted password 'golabi';
