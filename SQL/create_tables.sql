@@ -11,7 +11,7 @@ create domain party_domain as
 
 
 create domain election_type_domain as
-    varchar(10) check ( value in ('presidential', 'chair', 'khobregan', 'city_council'));
+    varchar check ( value in ('presidential', 'chair', 'khobregan', 'city_council'));
 -- btw chair is majles LOL
 
 create domain election_year_domain as
