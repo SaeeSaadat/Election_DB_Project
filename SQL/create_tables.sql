@@ -3,10 +3,8 @@ create table region (
     current_agents int,
     total_agents int
 );
-
 create domain religious_minority as
-    varchar(10) check ( value in ('christian', 'jewish', 'zardosht', 'None'));
-
+    varchar(10) check ( value in ('christian', 'jew', 'zardosht', 'None'));
 
 create domain party_domain as
     varchar(10) check ( value in ('left', 'right'));
@@ -27,7 +25,7 @@ create table Person (
     religion_minority religious_minority,
     region_id int,
 
-    foreign key (region_id) references region(id),
+    foreign key (region_id) references region(id) ON UPDATE CASCADE ON DELETE CASCADE ,
     check (age between 18 and 100),
     check (age between 1 and 100)
 
@@ -41,13 +39,13 @@ create table candidate (
     documents varchar(50),
     party party_domain,
     qualification bool default false,
-    foreign key (person_id) references person(id)
+    foreign key (person_id) references person(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 create table judge (
     judge_id serial primary key ,
     person_id int,
-    foreign key (person_id) references person(id)
+    foreign key (person_id) references person(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
@@ -66,7 +64,7 @@ create table branch (
     region_id int,
 
     primary key (branch_no, region_id),
-    foreign key (region_id) references region(id)
+    foreign key (region_id) references region(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 create table qualification (
@@ -78,8 +76,8 @@ create table qualification (
 
     primary key (election_type, election_year, judge_id, candidate_id),
     foreign key (election_type, election_year) references election(type, year),
-    foreign key (judge_id) references judge(judge_id),
-    foreign key (candidate_id) references candidate(candidate_id)
+    foreign key (judge_id) references judge(judge_id) ON UPDATE CASCADE ON DELETE CASCADE ,
+    foreign key (candidate_id) references candidate(candidate_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 create table vote (
@@ -89,10 +87,11 @@ create table vote (
     candidate_id int,
     branch_no int,
     primary key (election_year, election_type, person_id, candidate_id),
-    foreign key (election_type, election_year) references election(type, year),
-    foreign key (person_id) references person(id),
-    foreign key (candidate_id) references candidate(candidate_id)
+    foreign key (election_type, election_year) references election(type, year) ON UPDATE CASCADE ON DELETE CASCADE ,
+    foreign key (person_id) references person(id) ON UPDATE CASCADE ON DELETE CASCADE ,
+    foreign key (candidate_id) references candidate(candidate_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+
 
 
 create table user_person (
