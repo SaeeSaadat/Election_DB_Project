@@ -4,7 +4,7 @@ create table region (
     total_agents int
 );
 create domain religious_minority as
-    varchar(10) check ( value in ('christian', 'jew', 'zardosht', 'None'));
+    varchar(10) check ( value in ('christian', 'jewish', 'zardosht', 'None'));
 
 create domain party_domain as
     varchar(10) check ( value in ('left', 'right'));
