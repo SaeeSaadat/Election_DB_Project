@@ -93,6 +93,3 @@ create table vote (
     foreign key (person_id) references person(id),
     foreign key (candidate_id) references candidate(candidate_id)
 );
-
-
-create user god
