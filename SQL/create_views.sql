@@ -13,8 +13,9 @@ where up.username = (select user);
 grant SELECT on user_votes to simpleton;
 
 
-create view visible_candidates as select candidate_id , resume , documents , party from candidate
-where qualification = true;
+create view visible_candidates as select candidate_id , p.name , resume , documents , party
+from candidate c inner join person p on p.id = c.person_id
+where c.qualification = true;
 grant SELECT on visible_candidates to simpleton;
 
 
@@ -27,14 +28,13 @@ grant SELECT on region_info to simpleton;
 
 
 
-create view election_result as select candidate_id , count(candidate_id) from vote group by candidate_id
-having count(candidate_id) = (
-SELECT MAX(res)
-FROM ( SELECT candidate_id, COUNT(candidate_id) res
-FROM vote
-GROUP BY candidate_id) as cir);
-grant  select on election_result to simpleton;
-
+create view election_result as select v.candidate_id ,p.name , count(v.candidate_id)
+from vote v inner join candidate c on c.candidate_id = v.candidate_id
+inner join person p on p.id = c.person_id
+group by v.candidate_id
+order by count(v.candidate_id)
+limit 1;
+grant SELECT on election_result to simpleton;
 ---------------------------------------
 
 create view candidate_users_info as select p.id , p.name , p.age , p.rank , p.religion_minority , p.region_id  ,
@@ -99,3 +99,6 @@ grant select on all_judges_info to judges;
 
 
 grant select on qualification to judges;
+
+
+
