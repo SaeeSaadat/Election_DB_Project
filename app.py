@@ -1,22 +1,27 @@
 from flask import Flask, request, jsonify
-import json
+from flask_sqlalchemy import SQLAlchemy
+
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://saee:golabi@localhost:5432/election_db_project'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+db = SQLAlchemy(app)
 
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route('/')
 def hello_world():
-    return jsonify({'msg': 'go fuck yourself'})
+    a = db.session.query()
+    print(*(i[0] for i in a))
+    return jsonify({'msg': 'Hello World!'})
 
 
-def db_conf() -> dict:
-    with open('db_config.json') as conf:
-        data = json.load(conf)
-        return data
+def create_people():
+    for i in range(100000):
+        name = f'person-{i}'
+
+        # db.engine.execute(f'insert into person values({name})')
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-import routes.routes
