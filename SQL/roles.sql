@@ -23,3 +23,7 @@ insert into user_person values ('gholam', 12342);
 
 grant simpleton to asghar;
 grant simpleton to gholam;
+
+
+grant insert on qualification to judges;
+grant insert on vote to simpleton;

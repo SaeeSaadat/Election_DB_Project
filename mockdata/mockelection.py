@@ -17,8 +17,6 @@ def create_election():
     connection.close()
 
 
-
-
 if __name__ == '__main__':
     # create_election()
     print('mock data has been created.')

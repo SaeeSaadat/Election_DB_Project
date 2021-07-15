@@ -64,10 +64,12 @@ def create_candidates_and_judges():  # candidate [100, 120), judge [200, 210), c
         cursor.execute(f"insert into candidate values ({i}, {i + 99}, 'hi my name is potatoe and my number is {i}',"
                        f" 'https://documents.nowhere.com/candidate{i}', \'{'left' if i % 2 == 0 else 'right'}\', false);")
         cursor.execute(f"update person set rank = {30 + random.random() * 10} where id = {i + 99};")
+        cursor.execute(f"grant candidates to user{i+99};")
 
     for i in range(1, 11):
         cursor.execute(f"insert into judge values ({i}, {i + 199});")
         cursor.execute(f"update person set rank = 70 where id = {i + 199};")
+        cursor.execute(f"grant judges to user{i+199};")
 
     connection.commit()
     print('done')
