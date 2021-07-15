@@ -75,7 +75,7 @@ $qualify_vote_func$
 $qualify_vote_func$
 LANGUAGE 'plpgsql';
 
-CREATE TRIGGER qualify_vote BEFORE INSERT ON qualification
+CREATE TRIGGER qualify_vote BEFORE INSERT OR UPDATE ON qualification
     FOR EACH ROW EXECUTE PROCEDURE qualify_vote_func();
 
 
@@ -86,26 +86,33 @@ CREATE TRIGGER qualify_vote BEFORE INSERT ON qualification
 CREATE OR REPLACE FUNCTION qualify_candidate_func() RETURNS TRIGGER AS
 $qualify_candidate_func$
     BEGIN
-        IF (SELECT COUNT(*) FROM qualification
-        WHERE election_year = NEW.election_year
-          AND election_type = NEW.election_type
-          AND candidate_id = NEW.candidate_id
-          AND vote = TRUE) > (SELECT COUNT(*) FROM qualification
-        WHERE election_year = NEW.election_year
-          AND election_type = NEW.election_type
-          AND candidate_id = NEW.candidate_id
-          AND vote = FALSE) THEN
-            UPDATE candidate SET qualification = TRUE WHERE candidate_id = NEW.candidate_id;
-        ELSE
-            UPDATE candidate SET qualification = FALSE WHERE candidate_id = NEW.candidate_id;
+        IF (SELECT COUNT(*) FROM qualification WHERE candidate_id = NEW.candidate_id
+                AND election_type = NEW.election_type AND election_year = NEW.election_year) =
+           (SELECT COUNT(*) FROM judge) THEN
+            IF (SELECT COUNT(*) FROM qualification
+                WHERE election_year = NEW.election_year
+                AND election_type = NEW.election_type
+                AND candidate_id = NEW.candidate_id
+                AND vote = TRUE) > (SELECT COUNT(*) FROM qualification
+                                    WHERE election_year = NEW.election_year
+                                    AND election_type = NEW.election_type
+                                    AND candidate_id = NEW.candidate_id
+                                    AND vote = FALSE) THEN
+                UPDATE candidate SET qualification = TRUE WHERE candidate_id = NEW.candidate_id;
+            ELSE
+                UPDATE candidate SET qualification = FALSE WHERE candidate_id = NEW.candidate_id;
+            END IF;
+
+            IF (SELECT qualification FROM candidate WHERE candidate.candidate_id = NEW.candidate_id) = FALSE THEN
+                DELETE FROM vote WHERE vote.candidate_id = NEW.candidate_id;
+            END IF;
+
         END IF;
     END
 $qualify_candidate_func$
 LANGUAGE 'plpgsql';
 
 
-CREATE TRIGGER qualify_candidate AFTER INSERT ON qualification
+CREATE TRIGGER qualify_candidate AFTER INSERT OR UPDATE ON qualification
     FOR EACH ROW EXECUTE PROCEDURE qualify_candidate_func();
-
-
 
