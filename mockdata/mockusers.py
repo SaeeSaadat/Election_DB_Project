@@ -8,10 +8,10 @@ random.seed(10)
 def create_users():
     connection = psycopg2.connect(**conf)
     cursor = connection.cursor()
-    for i in range(100001, 1000000):
-        # cursor.execute(f"create role user{i} with login password 'pass';")
-        # cursor.execute(f"grant simpleton to user{i};")
-        cursor.execute(f"drop role user{i};")
+    for i in range(1, 100000):
+        cursor.execute(f"create role user{i} with login password 'pass';")
+        cursor.execute(f"grant simpleton to user{i};")
+        # cursor.execute(f"drop user user{i};")
         if i % 1000 == 0:
             connection.commit()
     connection.commit()
