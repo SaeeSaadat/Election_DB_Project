@@ -3,6 +3,7 @@ create table region (
     current_agents int,
     total_agents int
 );
+grant select on region to simpleton;
 create domain religious_minority as
     varchar(10) check ( value in ('christian', 'jewish', 'zardosht', 'None'));
 
@@ -105,3 +106,14 @@ create table user_person (
     person_id int,
     foreign key (person_id) references person(id)
 );
+
+
+
+select region_id from candidate c inner join person p on p.id = c.person_id where candidate_id = 6;
+
+
+
+select id from person where region_id = 30;
+
+
+update candidate set qualification = true where candidate_id = 6;

@@ -3,14 +3,14 @@ $voting_trigger_func$
 BEGIN
 
     IF NOT EXISTS(
-            select * from person where new.person_id = person.id
+            select * from people where new.person_id = people.id
         ) THEN
         RAISE EXCEPTION 'NO SUCH PERSON';
     END IF;
 
 
     IF NOT EXISTS(
-            select * from candidate where new.candidate_id = candidate.candidate_id
+            select * from visible_candidates where new.candidate_id = visible_candidates.candidate_id
         ) THEN
         RAISE EXCEPTION 'NO SUCH CANDIDATE';
     END IF;
@@ -27,50 +27,41 @@ BEGIN
 
 
     IF NOT EXISTS(
-            SELECT *
-            FROM branch
-            WHERE branch.branch_no = NEW.branch_no
-              and branch.region_id = (
-                select distinct p.region_id
-                from person p
-                         join branch b on p.region_id = b.region_id
-                where p.id = NEW.person_id
-            )
+            select * from region_info where region_info.branch_no = new.branch_no and region_info.id =
+
+            (select region_id from people where id = new.person_id)
         ) THEN
         RAISE EXCEPTION 'NO SUCH BRANCH';
     END IF;
 
-    IF (SELECT qualification FROM candidate WHERE candidate.candidate_id = NEW.candidate_id) = FALSE THEN
+    IF  not exists (SELECT * FROM visible_candidates WHERE visible_candidates.candidate_id = NEW.candidate_id) THEN
         RAISE EXCEPTION 'CHOSEN CANDIDATE IS NOT QUALIFIED';
     END IF;
 
-    IF ((SELECT religion_minority FROM person WHERE id = NEW.person_id) IS NULL) AND
-       ((SELECT region_id FROM person WHERE id = NEW.person_id) !=
+    IF ((SELECT religion_minority FROM people WHERE people.id = NEW.person_id) IS NULL) AND
+       ((SELECT region_id FROM people WHERE people.id = NEW.person_id) !=
         (SELECT region_id
-         FROM candidate c
-                  INNER JOIN person p ON p.id = c.person_id
+         FROM visible_candidates c
          WHERE c.candidate_id = NEW.candidate_id)) THEN
         RAISE EXCEPTION 'VOTER AND CHOSEN CANDIDATE ARE NOT IN THE SAME REGION';
     END IF;
 
 
-    IF (SELECT religion_minority from person where id = new.person_id) !=
-       (select p.religion_minority
-        from person p
-                 join candidate c on p.id = c.person_id)
+    IF (SELECT religion_minority from people where id = new.person_id) !=
+       (select religion_minority from visible_candidates where visible_candidates.candidate_id = new.candidate_id)
     THEN
         raise exception 'minorities with minorities, birds with birds!';
     END IF;
 
 
-    IF (SELECT count(*) FROM vote WHERE person_id = NEW.person_id) >=
+    IF (SELECT count(*) FROM user_votes where person_id = NEW.person_id) >=
        (SELECT total_agents - current_agents
-        FROM region
-        WHERE id = (SELECT region_id FROM person WHERE id = NEW.person_id)) THEN
+        FROM region where id = (select region_id from people where id = new.person_id)
+        ) THEN
         RAISE EXCEPTION 'VIOLATING MAXIMUM NUMBER OF VOTES';
     END IF;
 
-    IF (SELECT rank FROM person WHERE id = NEW.person_id) NOT BETWEEN
+    IF (SELECT rank FROM people WHERE id = NEW.person_id) NOT BETWEEN
         (SELECT voter_min_rank FROM election WHERE year = NEW.election_year AND type = NEW.election_type) AND
         (SELECT voter_max_rank FROM election WHERE year = NEW.election_year AND type = NEW.election_type) THEN
         RAISE EXCEPTION 'RANK NOT IN VOTING RANGE';
