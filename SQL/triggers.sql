@@ -53,6 +53,16 @@ BEGIN
         RAISE EXCEPTION 'VOTER AND CHOSEN CANDIDATE ARE NOT IN THE SAME REGION';
     END IF;
 
+
+    IF (SELECT religion_minority from person where id = new.person_id) !=
+       (select p.religion_minority
+        from person p
+                 join candidate c on p.id = c.person_id)
+    THEN
+        raise exception 'minorities with minorities, birds with birds!';
+    END IF;
+
+
     IF (SELECT count(*) FROM vote WHERE person_id = NEW.person_id) >=
        (SELECT total_agents - current_agents
         FROM region
@@ -110,8 +120,7 @@ CREATE OR REPLACE FUNCTION qualify_vote_func() RETURNS TRIGGER AS
 $qualify_vote_func$
 BEGIN
     IF (SELECT rank
-        FROM judge j
-                 INNER JOIN person p on p.id = j.person_id
+        FROM judge_user_info j
         WHERE j.judge_id = NEW.judge_id) !=
        (SELECT judge_rank FROM election WHERE type = NEW.election_type AND year = NEW.election_year) THEN
         RAISE EXCEPTION 'JUDGE CANNOT QUALIFY ANYONE IN THIS ELECTION DUE TO RANK PROBLEMS';
@@ -139,7 +148,13 @@ BEGIN
         WHERE candidate_id = NEW.candidate_id
           AND election_type = NEW.election_type
           AND election_year = NEW.election_year) =
-       (SELECT COUNT(*) FROM judge) THEN
+       (SELECT COUNT(*)
+        FROM judge
+            join person on judge.person_id = person.id
+           where person.rank = (select judge_rank from election
+                                where election.type = new.election_type
+                                and election.year = new.election_year)
+        ) THEN
         IF (SELECT COUNT(*)
             FROM qualification
             WHERE election_year = NEW.election_year

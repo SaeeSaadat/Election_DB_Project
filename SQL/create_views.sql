@@ -84,7 +84,7 @@ group by region_id, candidate_id;
 create view judge_user_info as select p.id , p.name , p.age , p.rank , p.religion_minority , p.region_id , j.judge_id
 from judge j inner join person p on p.id = j.person_id inner join user_person up on p.id = up.person_id where
 username = (select user);
-grant select on judge_user_info to judges;
+grant select on judge_user_info to simpleton;
 
 create view all_candidates_info as select p.name , p.age , p.rank , p.religion_minority , p.region_id,
     c.candidate_id , c.resume , c.documents , c.party , c.qualification from candidate c

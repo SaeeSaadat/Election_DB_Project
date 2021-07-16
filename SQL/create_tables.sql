@@ -30,7 +30,7 @@ create table Person (
     check (age between 1 and 100)
 
 );
-
+grant select on person to candidates, judges;
 
 create table candidate (
     candidate_id serial primary key ,
@@ -41,13 +41,15 @@ create table candidate (
     qualification bool default false,
     foreign key (person_id) references person(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+grant select, update on candidate to judges;
+
 
 create table judge (
     judge_id serial primary key ,
     person_id int,
     foreign key (person_id) references person(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
+grant select on judge to judges;
 
 create table election (
     type election_type_domain,
@@ -58,6 +60,7 @@ create table election (
 
     primary key (type, year)
 );
+grant select on election to simpleton;
 
 create table branch (
     branch_no serial,
@@ -66,6 +69,7 @@ create table branch (
     primary key (branch_no, region_id),
     foreign key (region_id) references region(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+grant select on branch to candidates, judges;
 
 create table qualification (
     election_type election_type_domain,
@@ -79,6 +83,8 @@ create table qualification (
     foreign key (judge_id) references judge(judge_id) ON UPDATE CASCADE ON DELETE CASCADE ,
     foreign key (candidate_id) references candidate(candidate_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+grant select on qualification to judges;
+
 
 create table vote (
     election_type election_type_domain,
@@ -91,7 +97,7 @@ create table vote (
     foreign key (person_id) references person(id) ON UPDATE CASCADE ON DELETE CASCADE ,
     foreign key (candidate_id) references candidate(candidate_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
+grant select on vote to judges;
 
 
 create table user_person (
