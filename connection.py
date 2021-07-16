@@ -21,7 +21,9 @@ def authenticate(function):
             try:
                 connection = psycopg2.connect(**conf)
                 cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-                result = function(user=req['user'], connection=connection, cursor=cursor, *args, **kwargs)
+                cursor.execute('select user;')
+                user = cursor.fetchone()
+                result = function(user=user, connection=connection, cursor=cursor, *args, **kwargs)
                 cursor.close()
                 connection.close()
             except (Exception, psycopg2.Error) as error:

@@ -13,11 +13,10 @@ where up.username = (select user);
 grant SELECT on user_votes to simpleton;
 
 
-create view visible_candidates as select candidate_id , p.name , resume , documents , party
+create view visible_candidates as select candidate_id , p.name , resume , documents , party, region_id
 from candidate c inner join person p on p.id = c.person_id
 where c.qualification = true;
 grant SELECT on visible_candidates to simpleton;
-
 
 
 create view region_info as select r.id , total_agents , current_agents , branch_no from
@@ -31,7 +30,7 @@ grant SELECT on region_info to simpleton;
 create view election_result as select v.candidate_id ,p.name , count(v.candidate_id)
 from vote v inner join candidate c on c.candidate_id = v.candidate_id
 inner join person p on p.id = c.person_id
-group by v.candidate_id
+group by v.candidate_id, p.name
 order by count(v.candidate_id)
 limit 1;
 grant SELECT on election_result to simpleton;
