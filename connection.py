@@ -23,7 +23,12 @@ def authenticate(function):
                 cursor = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
                 cursor.execute('select user;')
                 user = cursor.fetchone()
-                result = function(connection=connection, cursor=cursor, *args, **kwargs)
+                try:
+                    result = function(connection=connection, cursor=cursor, *args, **kwargs)
+                except (psycopg2.Error, Exception) as err:
+                    print(err)
+                    return bad_request(f'{err}', 403)
+
                 cursor.close()
                 connection.close()
             except (Exception, psycopg2.Error) as error:
