@@ -98,22 +98,10 @@ create table vote (
     foreign key (person_id) references person(id) ON UPDATE CASCADE ON DELETE CASCADE ,
     foreign key (candidate_id) references candidate(candidate_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
-grant select on vote to judges;
-
+grant select, delete on vote to judges;
 
 create table user_person (
     username varchar primary key ,
     person_id int,
     foreign key (person_id) references person(id)
 );
-
-
-
-select region_id from candidate c inner join person p on p.id = c.person_id where candidate_id = 6;
-
-
-
-select id from person where region_id = 30;
-
-
-update candidate set qualification = true where candidate_id = 6;
