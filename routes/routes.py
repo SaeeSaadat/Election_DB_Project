@@ -6,7 +6,7 @@ from connection import authenticate
 
 @app.route('/get/person', methods=['GET'])
 @authenticate
-def fetch_user(user, connection, cursor):
+def fetch_user(connection, cursor):
     cursor.execute(f"select * from people;")
     res = cursor.fetchall()
     print(*(i for i in res))
@@ -15,7 +15,7 @@ def fetch_user(user, connection, cursor):
 
 @app.route('/get/allcandidates')
 @authenticate
-def fetch_all_candidates(user, connection, cursor):
+def fetch_all_candidates(connection, cursor):
     cursor.execute(f"select * from visible_candidates;")
     res = cursor.fetchall()
     return jsonify(res)
@@ -23,7 +23,7 @@ def fetch_all_candidates(user, connection, cursor):
 
 @app.route('/get/candidates')
 @authenticate
-def fetch_candidates(user, connection, cursor):
+def fetch_candidates(connection, cursor):
     cursor.execute(f"select * from people;")
     usr = cursor.fetchone()
     user_region = usr.get('region_id')
@@ -35,6 +35,6 @@ def fetch_candidates(user, connection, cursor):
 
 @app.route('/get/result')
 @authenticate
-def fetch_result(user, connection, cursor):
+def fetch_result(connection, cursor):
     cursor.execute('select * from election_result;')
     return jsonify(cursor.fetchall())
