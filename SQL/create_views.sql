@@ -29,7 +29,7 @@ grant SELECT on region_info to simpleton;
 
 create view election_result as select v.candidate_id ,p.name , count(v.candidate_id)
 from vote v inner join candidate c on c.candidate_id = v.candidate_id
-inner join person p on p.id = c.person_id
+inner join person p on p.id = c.person_id where c.qualification = true
 group by v.candidate_id, p.name
 order by count(v.candidate_id)
 limit 1;
