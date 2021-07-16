@@ -32,14 +32,16 @@ $voting_trigger_func$
 	        (SELECT voter_max_rank FROM election WHERE year = NEW.election_year AND type = NEW.election_type) THEN
             RAISE EXCEPTION 'RANK NOT IN VOTING RANGE';
         END IF;
+
+	    RETURN NEW;
     END
 $voting_trigger_func$
 LANGUAGE 'plpgsql';
 
 CREATE TRIGGER voting_trigger BEFORE INSERT ON vote
     FOR EACH ROW EXECUTE PROCEDURE voting_trigger_func();
-
-
+update election set type = 'chair' where true;
+insert into vote values('chair', 1400, 12342, 1, 1);
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +52,7 @@ $create_judge_func$
         IF NOT EXISTS(SELECT * FROM election WHERE judge_rank = (SELECT rank FROM person WHERE id = NEW.person_id)) THEN
             RAISE EXCEPTION 'NOT QUALIFIED AS JUDGE DUE TO PROBLEMS WITH RANK';
         END IF;
+        RETURN NEW;
     END
 $create_judge_func$
 LANGUAGE 'plpgsql';
@@ -71,6 +74,7 @@ $qualify_vote_func$
            (SELECT judge_rank FROM election WHERE type = NEW.election_type AND year = NEW.election_year) THEN
             RAISE EXCEPTION 'JUDGE CANNOT QUALIFY ANYONE IN THIS ELECTION DUE TO RANK PROBLEMS';
         END IF;
+        RETURN NEW;
     END
 $qualify_vote_func$
 LANGUAGE 'plpgsql';
@@ -108,6 +112,7 @@ $qualify_candidate_func$
             END IF;
 
         END IF;
+        RETURN NEW;
     END
 $qualify_candidate_func$
 LANGUAGE 'plpgsql';
