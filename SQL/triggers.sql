@@ -9,16 +9,11 @@ $voting_trigger_func$
             RAISE EXCEPTION 'CHOSEN CANDIDATE IS NOT QUALIFIED';
         END IF;
 
-        IF ( (SELECT religion_minority FROM person WHERE id = NEW.person_id) = 'None' ) AND
+        IF ( (SELECT religion_minority FROM person WHERE id = NEW.person_id) = Null ) AND
            ( (SELECT region_id FROM person WHERE id = NEW.person_id) !=
            (SELECT region_id FROM candidate c INNER JOIN person p ON p.id = c.person_id
            WHERE c.candidate_id = NEW.candidate_id) ) THEN
             RAISE EXCEPTION 'VOTER AND CHOSEN CANDIDATE ARE NOT IN THE SAME REGION';
-        END IF;
-
-	    IF (SELECT region_id FROM branch WHERE branch.branch_no = NEW.branch_no) !=
-	       (SELECT region_id FROM person WHERE id = NEW.person_id) THEN
-            RAISE EXCEPTION 'VOTER AND CHOSEN BRANCH ARE NOT IN THE SAME REGION';
         END IF;
 
 	    IF (SELECT count(*) FROM vote WHERE person_id = NEW.person_id) >=
@@ -40,8 +35,7 @@ LANGUAGE 'plpgsql';
 
 CREATE TRIGGER voting_trigger BEFORE INSERT ON vote
     FOR EACH ROW EXECUTE PROCEDURE voting_trigger_func();
-update election set type = 'chair' where true;
-insert into vote values('chair', 1400, 12342, 1, 1);
+
 
 ------------------------------------------------------------------------------------------------------------------------
 
