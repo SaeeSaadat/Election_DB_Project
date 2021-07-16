@@ -38,3 +38,19 @@ def fetch_candidates(connection, cursor):
 def fetch_result(connection, cursor):
     cursor.execute('select * from election_result;')
     return jsonify(cursor.fetchall())
+
+
+@app.route('/get/myvotes')
+@authenticate
+def fetch_my_votes(connection, cursor):
+    cursor.execute('select * from user_votes;')
+    return jsonify(cursor.fetchall())
+
+
+
+@app.route('/get/regionalresult/<region>')
+@authenticate
+def fetch_regional_result(connection, cursor, region):
+    cursor.execute('')
+
+

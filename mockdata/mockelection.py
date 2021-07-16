@@ -9,7 +9,7 @@ def create_election():
     connection = psycopg2.connect(**conf)
     cursor = connection.cursor()
 
-    cursor.execute(f"insert into election values ('city_council', 1400, 35, 0, 70);")
+    cursor.execute(f"insert into election values ('chair', 1400, 35, 0, 70);")
 
     connection.commit()
     print('done')
