@@ -47,10 +47,11 @@ def fetch_my_votes(connection, cursor):
     return jsonify(cursor.fetchall())
 
 
-
-@app.route('/get/regionalresult/<region>')
+@app.route('/get/branches')
 @authenticate
-def fetch_regional_result(connection, cursor, region):
-    cursor.execute('')
-
-
+def fetch_branches(connection, cursor):
+    cursor.execute(
+        'select * from region_info;'
+    )
+    res = cursor.fetchall()
+    return jsonify(res if len(res) != 1 else res[0])

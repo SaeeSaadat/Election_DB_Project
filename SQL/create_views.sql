@@ -1,4 +1,5 @@
 drop view if exists people;
+
 create view people as
 select *
 from (
@@ -67,7 +68,7 @@ grant select on qualification_votes to candidates;
 drop view if exists all_region_info;
 create view all_region_info as select region_id , total_agents , current_agents , branch_no from
 region r inner join branch b on r.id = b.region_id;
-grant select on all_region_info to candidates;
+grant select on all_region_info to simpleton;
 
 drop view if exists total_election_res;
 create view total_election_res as select candidate_id , count(candidate_id) , (count(candidate_id) / count(*)) ratio
@@ -77,9 +78,12 @@ grant select on total_election_res to candidates;
 grant select on total_election_res to judges;
 
 drop view if exists  detailed_region_res;
-create view detailed_region_res as select region_id , candidate_id , count(candidate_id) from
+create view detailed_region_res as select region_id , c.candidate_id, c.party , count(c.candidate_id) as votes from
 vote v inner join branch b on v.branch_no = b.branch_no
-group by region_id, candidate_id;
+inner join candidate c on v.candidate_id = c.candidate_id
+group by region_id, c.candidate_id, party;
+
+grant select on detailed_region_res to asghar;
 
 
 
@@ -90,19 +94,45 @@ from judge j inner join person p on p.id = j.person_id inner join user_person up
 username = (select user);
 grant select on judge_user_info to simpleton;
 
+drop view if exists candidate_user_info;
+
+create view candidate_user_info as select p.id , p.name , p.age , p.rank , p.religion_minority , p.region_id , j.candidate_id
+from candidate j inner join person p on p.id = j.person_id inner join user_person up on p.id = up.person_id where
+username = (select user);
+grant select on candidate_user_info to simpleton;
+
 drop view if exists all_candidates_info;
 create view all_candidates_info as select p.name , p.age , p.rank , p.religion_minority , p.region_id,
     c.candidate_id , c.resume , c.documents , c.party , c.qualification from candidate c
         inner join person p on p.id = c.person_id;
-grant select on all_candidates_info to judges;
+grant select on all_candidates_info to judges, asghar;
 
 drop view if exists  all_judges_info;
 create view all_judges_info as select p.id , p.name , p.age , p.rank , p.religion_minority , p.region_id , j.judge_id
 from judge j inner join person p on p.id = j.person_id;
-grant select on all_judges_info to judges;
+grant select on all_judges_info to judges, asghar;
 
 
 grant select on qualification to judges;
 
 
 
+--------------------------------------------------------
+
+drop view if exists detailed_minority_res;
+
+create view detailed_minority_res as select p.religion_minority , c.candidate_id , count(c.candidate_id) as votes from
+vote v inner join candidate c on v.candidate_id = c.candidate_id
+inner join person p on c.person_id = p.id
+group by religion_minority, c.candidate_id;
+
+grant select on detailed_minority_res to asghar;
+
+drop view if exists rejections;
+
+create view rejections as
+select judge_id, count(vote)
+from qualification
+where vote = false
+group by judge_id;
+grant select on rejections to simpleton;

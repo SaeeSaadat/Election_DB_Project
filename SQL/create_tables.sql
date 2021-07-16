@@ -84,7 +84,7 @@ create table qualification (
     foreign key (judge_id) references judge(judge_id) ON UPDATE CASCADE ON DELETE CASCADE ,
     foreign key (candidate_id) references candidate(candidate_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
-grant select on qualification to judges;
+grant select, insert, update on qualification to judges;
 
 
 create table vote (

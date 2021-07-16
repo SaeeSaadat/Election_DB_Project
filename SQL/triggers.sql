@@ -25,6 +25,11 @@ BEGIN
         RAISE EXCEPTION 'NO SUCH ELECTION';
     END IF;
 
+    IF (
+            (select age from people) < 18
+        ) then
+        raise exception 'HELLO THERE CHILD! COMEBACK WITH YOUR PARENTS!';
+    END IF;
 
     IF NOT EXISTS(
             select * from region_info where region_info.branch_no = new.branch_no and region_info.id =
@@ -141,11 +146,12 @@ BEGIN
           AND election_year = NEW.election_year) =
        (SELECT COUNT(*)
         FROM judge
-            join person on judge.person_id = person.id
-           where person.rank = (select judge_rank from election
-                                where election.type = new.election_type
-                                and election.year = new.election_year)
-        ) THEN
+                 join person on judge.person_id = person.id
+        where person.rank = (select judge_rank
+                             from election
+                             where election.type = new.election_type
+                               and election.year = new.election_year)
+       ) THEN
         IF (SELECT COUNT(*)
             FROM qualification
             WHERE election_year = NEW.election_year

@@ -19,4 +19,4 @@ def db_conf() -> dict:
 if __name__ == '__main__':
     app.run(debug=True)
 
-from routes import routes, post_routes
+from routes import routes, post_routes, candidate_routes, public_api
