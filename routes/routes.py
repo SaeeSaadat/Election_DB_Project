@@ -31,3 +31,10 @@ def fetch_candidates(user, connection, cursor):
     cursor.execute(f"select * from visible_candidates where region_id = {user_region};")
     res = cursor.fetchall()
     return jsonify(res)
+
+
+@app.route('/get/result')
+@authenticate
+def fetch_result(user, connection, cursor):
+    cursor.execute('select * from election_result;')
+    return jsonify(cursor.fetchall())
